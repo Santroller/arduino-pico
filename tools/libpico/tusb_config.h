@@ -39,8 +39,12 @@
 #endif
 
 #define CFG_TUSB_RHPORT0_MODE     OPT_MODE_DEVICE
+#define CFG_TUSB_RHPORT1_MODE (OPT_MODE_HOST)
 #define CFG_TUSB_OS               OPT_OS_PICO
-
+#ifndef BOARD_TUH_MAX_SPEED
+#define BOARD_TUH_MAX_SPEED OPT_MODE_DEFAULT_SPEED
+#endif
+#define CFG_TUH_RPI_PIO_USB 1
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
 #ifndef CFG_TUSB_DEBUG
 #define CFG_TUSB_DEBUG           0
@@ -70,9 +74,9 @@
 #endif
 
 //------------- CLASS -------------//
-#define CFG_TUD_HID              (2)
-#define CFG_TUD_CDC              (1)
-#define CFG_TUD_MSC              (1)
+#define CFG_TUD_HID              (0)
+#define CFG_TUD_CDC              (0)
+#define CFG_TUD_MSC              (0)
 #define CFG_TUD_MIDI             (0)
 #define CFG_TUD_VENDOR           (0)
 

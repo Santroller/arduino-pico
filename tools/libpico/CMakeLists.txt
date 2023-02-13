@@ -97,6 +97,8 @@ target_link_libraries(pico
 	pico_unique_id
 	pico_util
 	tinyusb
+	tinyusb_pico_pio_usb
+	tinyusb_host
 	tinyusb_device_unmarked
 )
 
