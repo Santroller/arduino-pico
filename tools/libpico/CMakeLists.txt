@@ -72,6 +72,9 @@ target_link_libraries(pico
 	hardware_xosc
 	cmsis
 	cyw43_driver_picow
+	pico_btstack_ble
+	pico_btstack_classic
+	pico_btstack_cyw43
 	pico_async_context
 	pico_bit_ops
 	pico_bootrom
