@@ -32,6 +32,7 @@ target_compile_definitions(common INTERFACE
     LWIP_UDP=1
     LWIP_IGMP=1
     LWIP_CHECKSUM_CTRL_PER_NETIF=1
+    PIO_USB_DP_PIN_DEFAULT=20
 )
 
 target_compile_options(common INTERFACE
@@ -95,6 +96,8 @@ target_link_libraries(pico
     pico_unique_id
     pico_util
     tinyusb
+    tinyusb_pico_pio_usb
+    tinyusb_host
     tinyusb_device_unmarked
 )
 
