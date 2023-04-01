@@ -51,6 +51,8 @@ extern "C" {
 #define CFG_TUSB_DEBUG 0
 #endif
 
+
+#define CFG_TUH_HUB 1
 //--------------------------------------------------------------------
 // DEVICE CONFIGURATION
 //--------------------------------------------------------------------
@@ -59,6 +61,7 @@ extern "C" {
 #define CFG_TUD_ENDPOINT0_SIZE 64
 #endif
 
+#define CFG_TUH_DEVICE_MAX 8
 #define CFG_TUH_ENDPOINT_MAX 8
 #define CFG_TUD_ENDPOINT_MAX 8
 
