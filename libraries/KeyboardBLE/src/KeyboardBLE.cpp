@@ -35,9 +35,16 @@ KeyboardBLE_::KeyboardBLE_(void) {
 #define REPORT_ID 0x01
 
 static const uint8_t desc_keyboard[] = {TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(REPORT_ID))};
-void KeyboardBLE_::begin(const uint8_t *layout) {
+
+void KeyboardBLE_::begin(const char *localName, const char *hidName, const uint8_t *layout) {
+    if (!localName) {
+        localName = "PicoW BLE Keyboard";
+    }
+    if (!hidName) {
+        hidName = localName;
+    }
     _asciimap = layout;
-    PicoBluetoothBLEHID.startHID("PicoW BLE Keyboard", "PicoW BLE Keyboard", 0x03c1, desc_keyboard, sizeof(desc_keyboard));
+    PicoBluetoothBLEHID.startHID(localName, hidName, 0x03c1, desc_keyboard, sizeof(desc_keyboard));
 }
 
 void KeyboardBLE_::end(void) {
@@ -54,6 +61,11 @@ void KeyboardBLE_::sendReport(KeyReport* keys) {
     data.reserved = 0;
     memcpy(data.keycode, keys->keys, sizeof(data.keycode));
     PicoBluetoothBLEHID.send(&data, sizeof(data));
+}
+
+void KeyboardBLE_::sendConsumerReport(uint16_t key) {
+    (void) key;
+    // TODO - Need some BLE-specific code to send 2nd report
 }
 
 KeyboardBLE_ KeyboardBLE;

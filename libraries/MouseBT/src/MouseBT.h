@@ -25,11 +25,15 @@
 #include <HID_Mouse.h>
 
 class MouseBT_ : public HID_Mouse {
+private:
+    bool _running;
+
 public:
-    MouseBT_(void);
-    void begin(void);
+    MouseBT_(bool absolute = false);
+    void begin(const char *localName = nullptr, const char *hidName = nullptr);
     void end(void);
     virtual void move(int x, int y, signed char wheel = 0) override;
+    void setAbsolute(bool absolute = true);
 };
 extern MouseBT_ MouseBT;
 

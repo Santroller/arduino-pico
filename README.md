@@ -40,9 +40,11 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Invector Labs Challenger RP2040 LoRa
 * Invector Labs Challenger RP2040 SubGHz
 * Invector Labs Challenger RP2040 SD/RTC
+* Invector Labs Challenger RP2040 UWB
 * Invector Labs RPICO32
 * Melopero Cookie RP2040
 * Melopero Shake RP2040
+* Neko Systems BL2040 Mini
 * nullbits Bit-C PRO
 * Pimoroni PGA2040
 * Seeed XIAO RP2040
@@ -63,13 +65,33 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Generic (configurable flash, I/O pins)
 
 # Installing via Arduino Boards Manager
-**Windows Users**: Please do not use the Windows Store version of the actual Arduino application
+## Windows-specific Notes
+Please do not use the Windows Store version of the actual Arduino application
 because it has issues detecting attached Pico boards.  Use the "Windows ZIP" or plain "Windows"
 executable (EXE)  download direct from https://arduino.cc. and allow it to install any device
 drivers it suggests.  Otherwise the Pico board may not be detected.  Also, if trying out the
 2.0 beta Arduino please install the release 1.8 version beforehand to ensure needed device drivers
 are present.  (See #20 for more details.)
 
+## Linux-specific Notes
+Installing Arduino using flatpak (often used by "App Stores" in various Linux
+distributions) will mean it has restricted access to the host. This might cause uploads to fail
+with error messages such as the following:
+
+```
+Scanning for RP2040 devices
+...
+No drive to deploy.
+```
+
+If you encounter this, you will need to either install Arduino in a different manner, or override
+the flatpak sandboxing feature using the following command, then restarting Arduino.
+
+```
+flatpak override --user --filesystem=host:ro cc.arduino.IDE2
+```
+
+## Installation
 Open up the Arduino IDE and go to File->Preferences.
 
 In the dialog that pops up, enter the following URL in the "Additional Boards Manager URLs" field:
@@ -87,6 +109,12 @@ Type "pico" in the search box and select "Add":
 ![image](https://user-images.githubusercontent.com/11875/111917223-12063680-8a3c-11eb-8884-4f32b8f0feb1.png)
 
 # Installing via GIT
+
+**Windows Users:**  Before installing via `git` on Windows, please read and follow the directions in
+[this link](https://arduino-pico.readthedocs.io/en/latest/platformio.html#important-steps-for-windows-users-before-installing).
+If Win32 long paths are not enabled, and `git` not configured to use them then there
+may be errors when attempting to clone the submodules.
+
 To install via GIT (for latest and greatest versions):
 ````
 mkdir -p ~/Arduino/hardware/pico

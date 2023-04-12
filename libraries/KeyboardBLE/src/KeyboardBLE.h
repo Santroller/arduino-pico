@@ -28,9 +28,10 @@
 class KeyboardBLE_ : public HID_Keyboard {
 private:
     virtual void sendReport(KeyReport* keys) override;
+    virtual void sendConsumerReport(uint16_t key) override;
 public:
     KeyboardBLE_(void);
-    void begin(const uint8_t *layout = KeyboardLayout_en_US);
+    void begin(const char *localName = nullptr, const char *hidName = nullptr, const uint8_t *layout = KeyboardLayout_en_US);
     void end(void);
     void setBattery(int lvl);
 };

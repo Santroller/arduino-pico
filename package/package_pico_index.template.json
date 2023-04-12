@@ -36,6 +36,15 @@
                      "name": "Adafruit Feather RP2040 DVI"
                   },
                   {
+                     "name": "Adafruit Feather RP2040 RFM"
+                  },
+                  {
+                     "name": "Adafruit Feather RP2040 ThinkINK"
+                  },
+                  {
+                     "name": "Adafruit Feather RP2040 USB Host"
+                  },
+                  {
                      "name": "Adafruit ItsyBitsy RP2040"
                   },
                   {
@@ -105,6 +114,9 @@
                      "name": "iLabs Challenger 2040 NFC"
                   },
                   {
+                     "name": "iLabs Challenger 2040 UWB"
+                  },
+                  {
                      "name": "iLabs RPICO32"
                   },
                   {
@@ -112,6 +124,9 @@
                   },
                   {
                      "name": "Melopero Shake RP2040"
+                  },
+                  {
+                     "name": "Neko Systems BL2040 Mini"
                   },
                   {
                      "name": "nullbits Bit-C PRO"

@@ -210,11 +210,11 @@ def MakeBoard(name, vendor_name, product_name, vid, pid, pwr, boarddefine, flash
     for i in range(1, flashsizemb):
         fssizelist.append(i * 1024 * 1024)
     BuildHeader(name, vendor_name, product_name, vid, pid, pwr, boarddefine, name, flashsizemb * 1024 * 1024, boot2, extra)
-    if name == "generic":
+    if (name == "generic") or (name == "vccgnd_yd_rp2040"):
         BuildFlashMenu(name, 2*1024*1024, [0, 1*1024*1024])
-        BuildFlashMenu(name, 4*1024*1024, [0, 2*1024*1024])
-        BuildFlashMenu(name, 8*1024*1024, [0, 4*1024*1024])
-        BuildFlashMenu(name, 16*1024*1024, [0, 8*1024*1024])
+        BuildFlashMenu(name, 4*1024*1024, [0, 3*1024*1024, 2*1024*1024])
+        BuildFlashMenu(name, 8*1024*1024, [0, 7*1024*1024, 4*1024*1024, 2*1024*1024])
+        BuildFlashMenu(name, 16*1024*1024, [0, 15*1024*1024, 14*1024*1024, 12*1024*1024, 8*1024*1024, 4*1024*1024, 2*1024*1024])
     else:
         BuildFlashMenu(name, flashsizemb * 1024 * 1024, fssizelist)
     BuildFreq(name)
@@ -339,6 +339,9 @@ MakeBoard("0xcb_helios", "0xCB", "Helios", "0x1209", "0xCB74", 500, "0XCB_HELIOS
 MakeBoard("adafruit_feather", "Adafruit", "Feather RP2040", "0x239a", "0x80f1", 250, "ADAFRUIT_FEATHER_RP2040", 8, "boot2_w25x10cl_4_padded_checksum")
 MakeBoard("adafruit_feather_scorpio", "Adafruit", "Feather RP2040 SCORPIO", "0x239a", "0x8121", 250, "ADAFRUIT_FEATHER_RP2040_SCORPIO", 8, "boot2_w25q080_2_padded_checksum")
 MakeBoard("adafruit_feather_dvi", "Adafruit", "Feather RP2040 DVI", "0x239a", "0x8127", 250, "ADAFRUIT_FEATHER_RP2040_DVI", 8, "boot2_w25q080_2_padded_checksum")
+MakeBoard("adafruit_feather_rfm", "Adafruit", "Feather RP2040 RFM", "0x239a", "0x812D", 250, "ADAFRUIT_FEATHER_RP2040_RFM", 8, "boot2_w25q080_2_padded_checksum")
+MakeBoard("adafruit_feather_thinkink", "Adafruit", "Feather RP2040 ThinkINK", "0x239a", "0x812B", 250, "ADAFRUIT_FEATHER_RP2040_THINKINK", 8, "boot2_w25q080_2_padded_checksum")
+MakeBoard("adafruit_feather_usb_host", "Adafruit", "Feather RP2040 USB Host", "0x239a", "0x8129", 250, "ADAFRUIT_FEATHER_RP2040_USB_HOST", 8, "boot2_w25q080_2_padded_checksum")
 MakeBoard("adafruit_itsybitsy", "Adafruit", "ItsyBitsy RP2040", "0x239a", "0x80fd", 250, "ADAFRUIT_ITSYBITSY_RP2040", 8, "boot2_w25q080_2_padded_checksum")
 MakeBoard("adafruit_qtpy", "Adafruit", "QT Py RP2040", "0x239a", "0x80f7", 250, "ADAFRUIT_QTPY_RP2040", 8, "boot2_w25q080_2_padded_checksum")
 MakeBoard("adafruit_stemmafriend", "Adafruit", "STEMMA Friend RP2040", "0x239a", "0x80e3", 250, "ADAFRUIT_STEMMAFRIEND_RP2040", 8, "boot2_w25q080_2_padded_checksum")
@@ -378,13 +381,17 @@ MakeBoard("challenger_2040_subghz", "iLabs", "Challenger 2040 SubGHz", "0x2e8a",
 MakeBoard("challenger_2040_wifi", "iLabs", "Challenger 2040 WiFi", "0x2e8a", "0x1006", 250, "CHALLENGER_2040_WIFI_RP2040", 8, "boot2_w25q080_2_padded_checksum", ["WIFIESPAT2"])
 MakeBoard("challenger_2040_wifi_ble", "iLabs", "Challenger 2040 WiFi/BLE", "0x2e8a", "0x102C", 500, "CHALLENGER_2040_WIFI_BLE_RP2040", 8, "boot2_w25q080_2_padded_checksum", ["WIFIESPAT2"])
 MakeBoard("challenger_nb_2040_wifi", "iLabs", "Challenger NB 2040 WiFi", "0x2e8a", "0x100d", 500, "CHALLENGER_NB_2040_WIFI_RP2040", 8, "boot2_w25q080_2_padded_checksum", ["WIFIESPAT2"])
-MakeBoard("challenger_2040_sdrtc", "iLabs", "Challenger 2040 SD/RTC", "0x2e8a", "0x102d", 250, "CHALLENGER_NB_2040_SDRTC_RP2040", 8, "boot2_w25q080_2_padded_checksum")
-MakeBoard("challenger_2040_nfc", "iLabs", "Challenger 2040 NFC", "0x2e8a", "0x1036", 250, "CHALLENGER_NB_2040_NFC_RP2040", 8, "boot2_w25q080_2_padded_checksum")
+MakeBoard("challenger_2040_sdrtc", "iLabs", "Challenger 2040 SD/RTC", "0x2e8a", "0x102d", 250, "CHALLENGER_2040_SDRTC_RP2040", 8, "boot2_w25q080_2_padded_checksum")
+MakeBoard("challenger_2040_nfc", "iLabs", "Challenger 2040 NFC", "0x2e8a", "0x1036", 250, "CHALLENGER_2040_NFC_RP2040", 8, "boot2_w25q080_2_padded_checksum")
+MakeBoard("challenger_2040_uwb", "iLabs", "Challenger 2040 UWB", "0x2e8a", "0x1052", 500, "CHALLENGER_2040_UWB_RP2040", 8, "boot2_w25q080_2_padded_checksum")
 MakeBoard("ilabs_rpico32", "iLabs", "RPICO32", "0x2e8a", "0x1010", 250, "ILABS_2040_RPICO32_RP2040", 8, "boot2_w25q080_2_padded_checksum")
 
 # Melopero
 MakeBoard("melopero_cookie_rp2040", "Melopero", "Cookie RP2040", "0x2e8a", "0x1011", 250, "MELOPERO_COOKIE_RP2040", 8, "boot2_w25q080_2_padded_checksum")
 MakeBoard("melopero_shake_rp2040", "Melopero", "Shake RP2040", "0x2e8a", "0x1005", 250, "MELOPERO_SHAKE_RP2040", 16, "boot2_w25q080_2_padded_checksum")
+
+# Neko Systems
+MakeBoard("nekosystems_bl2040_mini", "Neko Systems", "BL2040 Mini", "0x2e8a", "0x000a", 500, "NEKOSYSTEMS_BL2040_MINI", 4, "boot2_generic_03h_2_padded_checksum")
 
 # nullbits
 MakeBoard("nullbits_bit_c_pro", "nullbits", "Bit-C PRO", "0x2e8a", "0x6e61", 500, "NULLBITS_BIT_C_PRO", 4, "boot2_w25x10cl_4_padded_checksum")
