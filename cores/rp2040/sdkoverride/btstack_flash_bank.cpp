@@ -12,14 +12,13 @@
 #include <string.h>
 #include <Arduino.h>
 
-const uint8_t __bluetooth_tlv[8192] __attribute__((aligned(4096))) = { 0 };
-extern const uint8_t __flash_binary_start;
+// const uint8_t __bluetooth_tlv[8192] __attribute__((aligned(4096))) = { 0 };
+// extern const uint8_t __flash_binary_start;
 
-#undef PICO_FLASH_BANK_TOTAL_SIZE
-#undef PICO_FLASH_BANK_STORAGE_OFFSET
-#define PICO_FLASH_BANK_TOTAL_SIZE sizeof(__bluetooth_tlv)
-#define PICO_FLASH_BANK_STORAGE_OFFSET ((unsigned int)(__bluetooth_tlv - &__flash_binary_start))
-
+// #undef PICO_FLASH_BANK_TOTAL_SIZE
+// #undef PICO_FLASH_BANK_STORAGE_OFFSET
+// #define PICO_FLASH_BANK_TOTAL_SIZE sizeof(__bluetooth_tlv)
+// #define PICO_FLASH_BANK_STORAGE_OFFSET ((unsigned int)(__bluetooth_tlv - &__flash_binary_start))
 #if 0
 // Check sizes
 static_assert(PICO_FLASH_BANK_TOTAL_SIZE % (FLASH_SECTOR_SIZE * 2) == 0, "PICO_FLASH_BANK_TOTAL_SIZE invalid");
