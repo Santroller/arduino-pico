@@ -15,7 +15,6 @@
 #define ENABLE_LE_PERIPHERAL
 #define ENABLE_LE_CENTRAL
 #define ENABLE_LE_SECURE_CONNECTIONS
-#define ENABLE_LE_DATA_LENGTH_EXTENSION
 #endif
 
 // BTstack configuration. buffers, sizes, ...
