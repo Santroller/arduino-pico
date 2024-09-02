@@ -43,6 +43,7 @@ target_compile_definitions(common-${cpu} INTERFACE
     LWIP_UDP=1
     LWIP_IGMP=1
     LWIP_CHECKSUM_CTRL_PER_NETIF=1
+    PIO_USB_DP_PIN_DEFAULT=20
     ${xdc}
 )
 
@@ -115,6 +116,8 @@ target_link_libraries(pico-${cpu}
     pico_util
     ${xll1}
     tinyusb
+    tinyusb_pico_pio_usb
+    tinyusb_hos
     tinyusb_device_unmarked
 )
 
