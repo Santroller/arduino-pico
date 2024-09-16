@@ -30,7 +30,7 @@ static_assert(PICO_FLASH_BANK_STORAGE_OFFSET + PICO_FLASH_BANK_TOTAL_SIZE <= PIC
 // Size of one bank
 #define PICO_FLASH_BANK_SIZE (PICO_FLASH_BANK_TOTAL_SIZE / 2)
 
-#if 0
+#if 1
 #define DEBUG_PRINT(format,args...) printf(format, ## args)
 #else
 #define DEBUG_PRINT(...)

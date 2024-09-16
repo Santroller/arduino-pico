@@ -51,8 +51,22 @@ extern "C" {
 #define CFG_TUSB_DEBUG 0
 #endif
 // #define CFG_TUSB_DEBUG 2
+/* USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.
+ * Tinyusb use follows macros to declare transferring memory so that they can be put
+ * into those specific section.
+ * e.g
+ * - CFG_TUSB_MEM SECTION : __attribute__ (( section(".usb_ram") ))
+ * - CFG_TUSB_MEM_ALIGN   : __attribute__ ((aligned(4)))
+ */
+#ifndef CFG_TUSB_MEM_SECTION
+#define CFG_TUSB_MEM_SECTION
+#endif
 
+#ifndef CFG_TUSB_MEM_ALIGN
+#define CFG_TUSB_MEM_ALIGN          __attribute__ ((aligned(4)))
+#endif
 
+#define CFG_TUH_ENABLED 1
 #define CFG_TUH_HUB 2
 //--------------------------------------------------------------------
 // DEVICE CONFIGURATION

@@ -116,8 +116,8 @@ target_link_libraries(pico-${cpu}
     pico_util
     ${xll1}
     tinyusb
+    tinyusb_host
     tinyusb_pico_pio_usb
-    tinyusb_hos
     tinyusb_device_unmarked
 )
 
@@ -133,14 +133,12 @@ target_compile_definitions(ipv4-big-${cpu} PUBLIC
 )
 
 if (${cpu} MATCHES "rp2040")
-    set(xll pico_cyw43_driver cyw43_driver cyw43_driver_picow pico_cyw43_driver pico_cyw43_arch pico_cyw43_arch_threadsafe_background)
+    set(xll pico_cyw43_driver cyw43_driver cyw43_driver_picow pico_cyw43_driver pico_cyw43_arch pico_cyw43_arch_none)
 elseif(${cpu} MATCHES "rp2350")
     set(xll)
 endif()
 set(picow_link_libraries
     common-${cpu}
-    pico_async_context
-    pico_async_context_threadsafe_background
     ${xll}
     pico_lwip
     pico_lwip_nosys
