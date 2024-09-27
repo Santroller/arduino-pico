@@ -133,7 +133,7 @@ target_compile_definitions(ipv4-big-${cpu} PUBLIC
 )
 
 if (${cpu} MATCHES "rp2040")
-    set(xll pico_cyw43_driver cyw43_driver cyw43_driver_picow pico_cyw43_driver pico_cyw43_arch pico_cyw43_arch_poll)
+    set(xll pico_cyw43_driver cyw43_driver cyw43_driver_picow pico_cyw43_driver pico_cyw43_arch pico_cyw43_arch_none)
 elseif(${cpu} MATCHES "rp2350")
     set(xll)
 endif()
