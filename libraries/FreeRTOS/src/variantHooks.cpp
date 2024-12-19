@@ -45,6 +45,7 @@
 // Interfaces for the main core to use FreeRTOS mutexes
 extern "C" {
     extern volatile bool __otherCoreIdled;
+    static UBaseType_t __savedIrqs[configNUMBER_OF_CORES];
 
     SemaphoreHandle_t __freertos_mutex_create() {
         return xSemaphoreCreateMutex();
@@ -90,6 +91,22 @@ extern "C" {
 
     bool __freertos_check_if_in_isr() {
         return portCHECK_IF_IN_ISR();
+    }
+
+    void __freertos_task_exit_critical() {
+        if (portGET_CRITICAL_NESTING_COUNT() == 1U && portCHECK_IF_IN_ISR()) {
+            taskEXIT_CRITICAL_FROM_ISR(__savedIrqs[portGET_CORE_ID()]);
+        } else {
+            taskEXIT_CRITICAL();
+        }
+    }
+
+    void __freertos_task_enter_critical() {
+        if (portGET_CRITICAL_NESTING_COUNT() == 0U && portCHECK_IF_IN_ISR()) {
+            __savedIrqs[portGET_CORE_ID()] = taskENTER_CRITICAL_FROM_ISR();
+        } else {
+            taskENTER_CRITICAL();
+        }
     }
 }
 

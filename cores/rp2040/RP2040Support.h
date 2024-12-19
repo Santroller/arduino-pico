@@ -18,10 +18,17 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#pragma once
+
 #include <hardware/clocks.h>
 #include <hardware/irq.h>
 #include <hardware/pio.h>
 #include <pico/unique_id.h>
+#ifdef PICO_RP2350
+#include <hardware/regs/powman.h>
+#else
+#include <hardware/regs/vreg_and_chip_reset.h>
+#endif
 #include <hardware/exception.h>
 #include <hardware/watchdog.h>
 #include <hardware/structs/rosc.h>
@@ -39,6 +46,13 @@
 #include "_freertos.h"
 
 extern "C" volatile bool __otherCoreIdled;
+
+extern "C" {
+#ifdef __PROFILE
+    typedef int (*profileWriteCB)(const void *data, int len);
+    extern void _writeProfile(profileWriteCB writeCB);
+#endif
+}
 
 class _MFIFO {
 public:
@@ -175,18 +189,22 @@ public:
 
     void begin() {
         _epoch = 0;
+#if !defined(__riscv) && !defined(__PROFILE)
         if (!__isFreeRTOS) {
             // Enable SYSTICK exception
             exception_set_exclusive_handler(SYSTICK_EXCEPTION, _SystickHandler);
             systick_hw->csr = 0x7;
             systick_hw->rvr = 0x00FFFFFF;
         } else {
+#endif
             int off = 0;
             _ccountPgm = new PIOProgram(&ccount_program);
             _ccountPgm->prepare(&_pio, &_sm, &off);
             ccount_program_init(_pio, _sm, off);
             pio_sm_set_enabled(_pio, _sm, true);
+#if !defined(__riscv) && !defined(__PROFILE)
         }
+#endif
     }
 
     // Convert from microseconds to PIO clock cycles
@@ -208,6 +226,7 @@ public:
     // Get CPU cycle count.  Needs to do magic to extens 24b HW to something longer
     volatile uint64_t _epoch = 0;
     inline uint32_t getCycleCount() {
+#if !defined(__riscv) && !defined(__PROFILE)
         if (!__isFreeRTOS) {
             uint32_t epoch;
             uint32_t ctr;
@@ -217,11 +236,15 @@ public:
             } while (epoch != (uint32_t)_epoch);
             return epoch + (1 << 24) - ctr; /* CTR counts down from 1<<24-1 */
         } else {
+#endif
             return ccount_read(_pio, _sm);
+#if !defined(__riscv) && !defined(__PROFILE)
         }
+#endif
     }
 
     inline uint64_t getCycleCount64() {
+#if !defined(__riscv) && !defined(__PROFILE)
         if (!__isFreeRTOS) {
             uint64_t epoch;
             uint64_t ctr;
@@ -231,8 +254,11 @@ public:
             } while (epoch != _epoch);
             return epoch + (1LL << 24) - ctr;
         } else {
+#endif
             return ccount_read(_pio, _sm);
+#if !defined(__riscv) && !defined(__PROFILE)
         }
+#endif
     }
 
     inline int getFreeHeap() {
@@ -272,7 +298,11 @@ public:
 
     inline uint32_t getStackPointer() {
         uint32_t *sp;
+#if defined(__riscv)
+        asm volatile("mv %0, sp" : "=r"(sp));
+#else
         asm volatile("mov %0, sp" : "=r"(sp));
+#endif
         return (uint32_t)sp;
     }
 
@@ -330,7 +360,9 @@ public:
         }
     }
 
+#ifdef PICO_RP2040
     static void enableDoubleResetBootloader();
+#endif
 
     void wdt_begin(uint32_t delay_ms) {
         watchdog_enable(delay_ms, 1);
@@ -338,6 +370,61 @@ public:
 
     void wdt_reset() {
         watchdog_update();
+    }
+
+    enum resetReason_t {UNKNOWN_RESET, PWRON_RESET, RUN_PIN_RESET, SOFT_RESET, WDT_RESET, DEBUG_RESET, GLITCH_RESET, BROWNOUT_RESET};
+
+    resetReason_t getResetReason(void) {
+        io_rw_32 *WD_reason_reg = (io_rw_32 *)(WATCHDOG_BASE + WATCHDOG_REASON_OFFSET);
+
+        if (watchdog_caused_reboot() && watchdog_enable_caused_reboot()) { // watchdog timer
+            return WDT_RESET;
+        }
+
+        if (*WD_reason_reg & WATCHDOG_REASON_TIMER_BITS) { // soft reset() or reboot()
+            return SOFT_RESET;
+        }
+
+#ifdef PICO_RP2350
+        // **** RP2350 is untested ****
+        io_rw_32 *rrp = (io_rw_32 *)(POWMAN_BASE + POWMAN_CHIP_RESET_OFFSET);
+
+        if (*rrp & POWMAN_CHIP_RESET_HAD_POR_BITS) { // POR: power-on reset (brownout is separately detected on RP2350)
+            return PWRON_RESET;
+        }
+
+        if (*rrp & POWMAN_CHIP_RESET_HAD_RUN_LOW_BITS) { // RUN pin
+            return RUN_PIN_RESET;
+        }
+
+        if ((*rrp & POWMAN_CHIP_RESET_HAD_DP_RESET_REQ_BITS) || (*rrp & POWMAN_CHIP_RESET_HAD_RESCUE_BITS) || (*rrp & POWMAN_CHIP_RESET_HAD_HZD_SYS_RESET_REQ_BITS)) { // DEBUG port
+            return DEBUG_RESET;
+        }
+
+        if (*rrp & POWMAN_CHIP_RESET_HAD_GLITCH_DETECT_BITS) { // power supply glitch
+            return GLITCH_RESET;
+        }
+
+        if (*rrp & POWMAN_CHIP_RESET_HAD_BOR_BITS) { // power supply brownout reset
+            return BROWNOUT_RESET;
+        }
+
+#else
+        io_rw_32 *rrp = (io_rw_32 *)(VREG_AND_CHIP_RESET_BASE + VREG_AND_CHIP_RESET_CHIP_RESET_OFFSET);
+
+        if (*rrp & VREG_AND_CHIP_RESET_CHIP_RESET_HAD_POR_BITS) { // POR: power-on reset or brown-out detection
+            return PWRON_RESET;
+        }
+
+        if (*rrp & VREG_AND_CHIP_RESET_CHIP_RESET_HAD_RUN_BITS) { // RUN pin
+            return RUN_PIN_RESET;
+        }
+
+        if (*rrp & VREG_AND_CHIP_RESET_CHIP_RESET_HAD_PSM_RESTART_BITS) { // DEBUG port
+            return DEBUG_RESET; // **** untested **** debug reset may just cause a rebootToBootloader()
+        }
+#endif
+        return UNKNOWN_RESET;
     }
 
     const char *getChipID() {
@@ -387,13 +474,28 @@ public:
     }
 
     bool isPicoW() {
-#if !defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if !defined(PICO_CYW43_SUPPORTED)
         return false;
 #else
         extern bool __isPicoW;
         return __isPicoW;
 #endif
     }
+
+#ifdef __PROFILE
+    void writeProfiling(Stream *f) {
+        extern Stream *__profileFile;
+        extern int __writeProfileCB(const void *data, int len);
+        __profileFile = f;
+        _writeProfile(__writeProfileCB);
+    }
+
+    size_t getProfileMemoryUsage() {
+        extern int __profileMemSize;
+        return (size_t) __profileMemSize;
+    }
+#endif
+
 
 
 private:

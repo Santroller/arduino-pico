@@ -53,15 +53,13 @@
 
 // Dup'd to avoid CYW43 dependency
 // Generate a mac address if one is not set in otp
-extern "C" {
-    static void cyw43_hal_generate_laa_mac(__unused int idx, uint8_t buf[6]) {
-        pico_unique_board_id_t board_id;
-        pico_get_unique_board_id(&board_id);
-        memcpy(buf, &board_id.id[2], 6);
-        buf[0] &= (uint8_t)~0x1; // unicast
-        buf[0] |= 0x2; // locally administered
-    }
-};
+static void _cyw43_hal_generate_laa_mac(__unused int idx, uint8_t buf[6]) {
+    pico_unique_board_id_t board_id;
+    pico_get_unique_board_id(&board_id);
+    memcpy(buf, &board_id.id[2], 6);
+    buf[0] &= (uint8_t)~0x1; // unicast
+    buf[0] |= 0x2; // locally administered
+}
 
 
 
@@ -70,8 +68,6 @@ enum EthernetLinkStatus {
     LinkON,
     LinkOFF
 };
-
-extern "C" void cyw43_hal_generate_laa_mac(__unused int idx, uint8_t buf[6]);
 
 template<class RawDev>
 class LwipIntfDev: public LwipIntf, public RawDev {
@@ -181,6 +177,7 @@ protected:
     static err_t linkoutput_s(netif* netif, struct pbuf* p);
     static void  netif_status_callback_s(netif* netif);
     static void _irq(void *param);
+
 public:
     // called on a regular basis or on interrupt
     err_t handlePackets();
@@ -355,7 +352,7 @@ bool LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu) {
 #if 1
         // forge a new mac-address from the esp's wifi sta one
         // I understand this is cheating with an official mac-address
-        cyw43_hal_generate_laa_mac(0, _macAddress);
+        _cyw43_hal_generate_laa_mac(0, _macAddress);
 #else
         // https://serverfault.com/questions/40712/what-range-of-mac-addresses-can-i-safely-use-for-my-virtual-machines
         memset(_macAddress, 0, 6);
@@ -533,12 +530,16 @@ err_t LwipIntfDev<RawDev>::netif_init() {
     return ERR_OK;
 }
 
+extern std::function<void(struct netif *)>  _scb;
 template<class RawDev>
 void LwipIntfDev<RawDev>::netif_status_callback() {
     check_route();
     if (connected()) {
         sntp_stop();
         sntp_init();
+    }
+    if (_scb) {
+        _scb(&_netif);
     }
 }
 

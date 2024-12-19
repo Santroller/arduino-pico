@@ -4,7 +4,7 @@
 
 Raspberry Pi Pico Arduino core, for all RP2040 and RP2350 boards
 
-This is a port of Arduino to the RP2040 (Raspberry Pi Pico processor) and RP2350 (Raspberry Pi Pico 2 processor). It uses the bare Raspberry Pi Pico SDK and a custom GCC 12.3/Newlib 4.0 toolchain.
+This is a port of Arduino to the RP2040 (Raspberry Pi Pico processor) and RP2350 (Raspberry Pi Pico 2 processor). It uses the bare Raspberry Pi Pico SDK and a custom GCC 14.2/Newlib 4.3 toolchain and supports ARM and RISC-V cores.
 
 # Documentation
 See https://arduino-pico.readthedocs.io/en/latest/ along with the examples for more detailed usage information.
@@ -16,9 +16,11 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Raspberry Pi Pico
 * Raspberry Pi Pico W
 * Raspberry Pi Pico 2
+* Raspberry Pi Pico 2W
 * 0xCB Helios
 * Adafruit Feather RP2040
 * Adafruit Feather RP2040 SCORPIO
+* Adafruit Floppsy RP2040
 * Adafruit ItsyBitsy RP2040
 * Adafruit KB2040
 * Adafruit Macropad RP2040
@@ -30,6 +32,8 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Amken Revelop 
 * Amken Revelop Plus 
 * Amken Revelop eS
+* Architeuthis Flux Jumperless
+* Architeuthis Flux Jumperless V5
 * Arduino Nano RP2040 Connect
 * ArtronShop RP2 Nano
 * Breadstick Raspberry
@@ -40,7 +44,8 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Cytron Maker Nano RP2040
 * Cytron Maker Uno RP2040
 * Cytron Motion 2350 Pro
-* DatanoiseTV PicoADK+
+* Datanoise PicoADK v1
+* Datanoise PicoADK v2 (RP2350)
 * Degz Suibo RP2040
 * DeRuiLab FlyBoard2040 Core
 * DFRobot Beetle RP2040
@@ -63,13 +68,16 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Melopero Cookie RP2040
 * Melopero Shake RP2040
 * METE HOCA Akana R1
+* MyMakers RP2040
 * Neko Systems BL2040 Mini
-* Olimex RP2040-Pico30
 * Newsan Archi
 * nullbits Bit-C PRO
+* Olimex RP2040-Pico30
 * Pimoroni PGA2040
 * Pimoroni Pico Plus 2
+* Pimoroni Pico Plus 2W
 * Pimoroni Plasma2040
+* Pimoroni Plasma2350
 * Pimoroni Tiny2040
 * Pimoroni Tiny2350
 * Pintronix PinMax
@@ -79,6 +87,7 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Sea-Picro
 * Seeed Indicator RP2040
 * Seeed XIAO RP2040
+* Seeed XIAO RP2350
 * Silicognition RP2040-Shim
 * Solder Party RP2040 Stamp
 * Solder Party RP2350 Stamp
@@ -87,6 +96,7 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * SparkFun ProMicro RP2040
 * SparkFun ProMicro RP2350
 * SparkFun Thing Plus RP2040
+* SparkFun Thing Plus RP2350
 * uPesy RP2040 DevKit
 * VCC-GND YD-RP2040
 * Viyalab Mizu RP2040
@@ -98,7 +108,10 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Waveshare RP2040 Matrix
 * Waveshare RP2040 PiZero
 * WIZnet W5100S-EVB-Pico
+* WIZnet W5100S-EVB-Pico2
 * WIZnet W5500-EVB-Pico
+* WIZnet W5500-EVB-Pico2
+* WIZnet W55RP20-EVB-Pico
 * WIZnet WizFi360-EVB-Pico
 * Generic RP2040 (configurable flash, I/O pins)
 * Generic RP2350 (configurable flash, I/O pins)
@@ -125,6 +138,9 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Peripherals:  SPI master/slave, Wire(I2C) master/slave, dual UART, emulated EEPROM, I2S audio input/output, Servo
 * printf (i.e. debug) output over USB serial
 * Transparent use of PSRAM globals and heap (RP2350 only)
+* ARM or RISC-V (Hazard3) support for the RP2350
+* Semihosted serial and file system access
+* GPROF profiling support
 
 The RP2040 PIO state machines (SMs) are used to generate jitter-free:
 * Servos
@@ -261,6 +277,7 @@ The installed tools include a version of OpenOCD (in the pqt-openocd directory) 
 * [Xoshiro-cpp](https://github.com/Reputeless/Xoshiro-cpp) is copyright (c) 2020 Ryo Suzuki and distributed under the MIT license.
 * [FatFS low-level filesystem](http://elm-chan.org/fsw/ff/) code is Copyright (C) 2024, ChaN, all rights reserved.
 * [TLSF memory manager for PSRAM from Espressif fork](https://github.com/espressif/tlsf) of [original](https://github.com/mattconte/tlsf) by Matthew Conte is copyright Matthew Conte and licensed under the MIT license.
+* [ESPHost library](https://github.com/Networking-for-Arduino/ESPHost) is LGPL licensed by its maintainers.
 
 -Earle F. Philhower, III  
  earlephilhower@yahoo.com

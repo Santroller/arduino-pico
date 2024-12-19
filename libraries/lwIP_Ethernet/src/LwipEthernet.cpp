@@ -22,7 +22,7 @@
 #include <lwip/timeouts.h>
 #include <lwip/dns.h>
 #include <pico/mutex.h>
-#if defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(PICO_CYW43_SUPPORTED)
 #include <pico/cyw43_arch.h>
 #endif
 #include <pico/async_context_threadsafe_background.h>
@@ -41,7 +41,7 @@ static async_context_t *_context = nullptr;
 static std::map<int, std::function<void(void)>> _handlePacketList;
 
 void ethernet_arch_lwip_begin() {
-#if defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(PICO_CYW43_SUPPORTED)
     if (rp2040.isPicoW()) {
         cyw43_arch_lwip_begin();
         return;
@@ -51,7 +51,7 @@ void ethernet_arch_lwip_begin() {
 }
 
 void ethernet_arch_lwip_end() {
-#if defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(PICO_CYW43_SUPPORTED)
     if (rp2040.isPicoW()) {
         cyw43_arch_lwip_end();
         return;
@@ -75,14 +75,22 @@ void __removeEthernetPacketHandler(int id) {
 }
 
 #define GPIOSTACKSIZE 8
-static uint32_t gpioMaskStack[GPIOSTACKSIZE][4];
-static uint32_t gpioMask[4] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff};
+#ifdef PICO_RP2350B
+#define GPIOIRQREGS 6
+#define GPIOIRQREGSINIT 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
+#else
+#define GPIOIRQREGS 4
+#define GPIOIRQREGSINIT 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
+#endif
+
+static uint32_t gpioMaskStack[GPIOSTACKSIZE][GPIOIRQREGS];
+static uint32_t gpioMask[GPIOIRQREGS] = {GPIOIRQREGSINIT};
 
 void ethernet_arch_lwip_gpio_mask() {
     noInterrupts();
-    memmove(gpioMaskStack[1], gpioMaskStack[0], 4 * sizeof(uint32_t) * (GPIOSTACKSIZE - 1)); // Push down the stack
+    memmove(gpioMaskStack[1], gpioMaskStack[0], GPIOIRQREGS * sizeof(uint32_t) * (GPIOSTACKSIZE - 1)); // Push down the stack
     io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ? &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < GPIOIRQREGS; i++) {
         gpioMaskStack[0][i] = irq_ctrl_base->inte[i];
         irq_ctrl_base->inte[i] = irq_ctrl_base->inte[i] & gpioMask[i];
     }
@@ -92,10 +100,10 @@ void ethernet_arch_lwip_gpio_mask() {
 void ethernet_arch_lwip_gpio_unmask() {
     noInterrupts();
     io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ? &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < GPIOIRQREGS; i++) {
         irq_ctrl_base->inte[i] = gpioMaskStack[0][i];
     }
-    memmove(gpioMaskStack[0], gpioMaskStack[1],  4 * sizeof(uint32_t) * (GPIOSTACKSIZE - 1)); // Pop up the stack
+    memmove(gpioMaskStack[0], gpioMaskStack[1],  GPIOIRQREGS * sizeof(uint32_t) * (GPIOSTACKSIZE - 1)); // Pop up the stack
     interrupts();
 }
 
@@ -179,7 +187,7 @@ static void ethernet_timeout_reached(__unused async_context_t *context, __unused
     for (auto handlePacket : _handlePacketList) {
         handlePacket.second();
     }
-#if defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(PICO_CYW43_SUPPORTED)
     if (!rp2040.isPicoW()) {
         sys_check_timeouts();
     }
@@ -199,7 +207,7 @@ void __startEthernetContext() {
     if (__ethernetContextInitted) {
         return;
     }
-#if defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(PICO_CYW43_SUPPORTED)
     if (rp2040.isPicoW()) {
         _context = cyw43_arch_async_context();
     } else {
@@ -220,4 +228,9 @@ void lwipPollingPeriod(int ms) {
         // No need for mutexes, this is an atomic 32b write
         _pollingPeriod = ms;
     }
+}
+
+std::function<void(struct netif *)>  _scb;
+void __setStateChangeCallback(std::function<void(struct netif *)> s) {
+    _scb = s;
 }

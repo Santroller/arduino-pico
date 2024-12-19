@@ -76,10 +76,13 @@ extern "C" void *pcalloc(size_t count, size_t size) {
 #else
 // No PSRAM, always fail
 extern "C" void *pmalloc(size_t size) {
+    (void) size;
     return nullptr;
 }
 
 extern "C" void *pcalloc(size_t count, size_t size) {
+    (void) count;
+    (void) size;
     return nullptr;
 }
 #endif
@@ -88,7 +91,7 @@ extern "C" void *__wrap_realloc(void *mem, size_t size) {
     void *rc;
     noInterrupts();
 #ifdef RP2350_PSRAM_CS
-    if (mem < __ram_start) {
+    if (mem && (mem < __ram_start)) {
         rc = __psram_realloc(mem, size);
     } else {
         rc = __real_realloc(mem, size);
@@ -103,7 +106,7 @@ extern "C" void *__wrap_realloc(void *mem, size_t size) {
 extern "C" void __wrap_free(void *mem) {
     noInterrupts();
 #ifdef RP2350_PSRAM_CS
-    if (mem < __ram_start) {
+    if (mem && (mem < __ram_start)) {
         __psram_free(mem);
     } else {
         __real_free(mem);

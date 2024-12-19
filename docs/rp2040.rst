@@ -57,6 +57,11 @@ void rp2040.wdt_reset()
 ~~~~~~~~~~~~~~~~~~~~~~~
 Reloads the watchdog's counter with the amount of time set by wdt_begin.
 
+RP2040::resetReason_t rp2040.getResetReason()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns the reason for the last reset, defined in enum ``RP2040::resetReason_t``.
+See example ```ResetReason``` for some details.
+
 
 Memory Information
 ------------------
@@ -90,8 +95,8 @@ doing any WiFi calls.
 Bootloader
 ----------
 
-void rp2040.enableDoubleResetBootloader()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void rp2040.enableDoubleResetBootloader()  (Pico/RP2040 only)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Add a call anywhere in the sketch to ``rp2040.enableDoubleResetBootloader()`` and
 the core will check for a double-tap on reset, and if found will start the USB
 bootloader.

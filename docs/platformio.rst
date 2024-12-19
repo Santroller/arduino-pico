@@ -156,6 +156,22 @@ platform <https://github.com/maxgerhardt/platform-raspberrypi/blob/77e0d3a29d1db
     ; Flash Size: 2MB (Sketch: 0.5MB, FS:1.5MB)
     board_build.filesystem_size = 1.5m
 
+PSRAM size
+----------
+
+For RP2350 based boards, this controls how much PSRAM the firmware will think it has available in bytes, mapped at starting address 0x11000000.
+
+To learn more about PSRAM usage, see: :doc:`RP2350 PSRAM Support <psram>` 
+
+.. code:: ini
+
+    ; PSRAM size: 1MB
+    board_upload.psram_length = 1048576
+    ; PSRAM size: 2MB
+    board_upload.psram_length = 2097152
+    ; PSRAM size: 4MB
+    board_upload.psram_length = 4194304
+
 CPU Speed
 ---------
 
@@ -262,6 +278,18 @@ default Pico SDK USB stack. To change it, add
 Note that the special "No USB" setting is also supported, through the
 shortcut-define ``PIO_FRAMEWORK_ARDUINO_NO_USB``.
 
+USB Customization
+-----------------
+
+If you want to change the USB VID, PID, product or manufacturer name that the device will appear under, configure them as follows:
+
+.. code:: ini
+
+    board_build.arduino.earlephilhower.usb_manufacturer = Custom Manufacturer
+    board_build.arduino.earlephilhower.usb_product = Ultra Cool Product
+    board_build.arduino.earlephilhower.usb_vid = 0xABCD
+    board_build.arduino.earlephilhower.usb_pid = 0x1337
+
 IP Stack
 --------
 
@@ -308,6 +336,19 @@ local copy of the core (with e.g. some modifications) on disk (`see documentatio
 
 Note that this can only be done for versions that have the PlatformIO
 builder script it in, so versions before 1.9.2 are not supported.
+
+Selecting the CPU architecture
+------------------------------
+
+By default Platform.IO will build for the onboard ARM cores on the RP2350.  To build RISC-V binaries
+adjust the ``board_build.mcu`` option accordingly:
+
+.. code:: ini
+
+    ; RP2350 based (RISC-V)
+    [env:rpipico2-riscv]
+    board = rpipico2
+    board_build.mcu = rp2350-riscv
 
 Examples
 --------

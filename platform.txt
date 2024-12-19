@@ -20,7 +20,7 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=Raspberry Pi RP2040/RP2350 Boards
-version=4.0.2
+version=4.4.0
 
 # Required discoveries and monitors
 # ---------------------------------
@@ -29,13 +29,14 @@ pluggable_discovery.required.1=builtin:mdns-discovery
 pluggable_monitor.required.serial=builtin:serial-monitor
 
 runtime.tools.pqt-gcc.path={runtime.platform.path}/system/arm-none-eabi
+runtime.tools.pqt-gcc-riscv.path={runtime.platform.path}/system/riscv32-unknown-elf
 runtime.tools.pqt-python3.path={runtime.platform.path}/system/python3
 runtime.tools.pqt-mklittlefs.path={runtime.platform.path}/system/mklittlefs
 runtime.tools.pqt-pioasm.path={runtime.platform.path}/system/pioasm
 runtime.tools.pqt-elf2uf2.path={runtime.platform.path}/system/elf2uf2
 runtime.tools.pqt-openocd.path={runtime.platform.path}/system/openocd
 runtime.tools.pqt-picotool.path={runtime.platform.path}/system/picotool
-compiler.path={runtime.tools.pqt-gcc.path}/bin/
+compiler.path={runtime.tools.{build.toolchainpkg}.path}/bin/
 
 compiler.libraries.ldflags=
 
@@ -61,9 +62,9 @@ compiler.c.flags=-c {compiler.warning_flags} {compiler.defines} {compiler.flags}
 compiler.c.elf.cmd={build.toolchain}-g++
 compiler.c.elf.flags={compiler.warning_flags} {compiler.defines} {compiler.flags} {build.flags.optimize} -u _printf_float -u _scanf_float
 compiler.S.cmd={build.toolchain}-gcc
-compiler.S.flags=-c {compiler.warning_flags} {compiler.defines} -g -x assembler-with-cpp -MMD {compiler.includes} -g
+compiler.S.flags=-c {compiler.warning_flags} {compiler.defines} -g -x assembler-with-cpp -MMD {compiler.includes} {build.toolchainopts} -g
 compiler.cpp.cmd={build.toolchain}-g++
-compiler.cpp.flags=-c {compiler.warning_flags} {compiler.defines} {compiler.flags} -MMD {compiler.includes} {build.flags.rtti} -std=gnu++17 -g -pipe
+compiler.cpp.flags=-c {compiler.warning_flags} {compiler.defines} {compiler.flags} -MMD {compiler.includes} {build.flags.rtti} {build.flags.profile} -std=gnu++17 -g -pipe
 
 compiler.ar.cmd={build.toolchain}-ar
 compiler.ar.flags=rcs
@@ -72,7 +73,7 @@ compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,
 compiler.elf2hex.bin.flags=-O binary
 compiler.elf2hex.hex.flags=-O ihex -R .eeprom
 compiler.elf2hex.cmd={build.toolchain}-objcopy
-compiler.ldflags={compiler.wrap} -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--undefined=runtime_init_install_ram_vector_table
+compiler.ldflags={compiler.wrap} -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--undefined=runtime_init_install_ram_vector_table -Wl,--undefined=__pre_init_runtime_init_clocks -Wl,--undefined=__pre_init_runtime_init_bootrom_reset -Wl,--undefined=__pre_init_runtime_init_early_resets -Wl,--undefined=__pre_init_runtime_init_usb_power_down -Wl,--undefined=__pre_init_runtime_init_clocks -Wl,--undefined=__pre_init_runtime_init_post_clock_resets -Wl,--undefined=__pre_init_runtime_init_spin_locks_reset -Wl,--undefined=__pre_init_runtime_init_boot_locks_reset -Wl,--undefined=__pre_init_runtime_init_bootrom_locking_enable -Wl,--undefined=__pre_init_runtime_init_mutex -Wl,--undefined=__pre_init_runtime_init_default_alarm_pool -Wl,--undefined=__pre_init_first_per_core_initializer -Wl,--undefined=__pre_init_runtime_init_per_core_bootrom_reset -Wl,--undefined=__pre_init_runtime_init_per_core_h3_irq_registers -Wl,--undefined=__pre_init_runtime_init_per_core_irq_priorities
 compiler.size.cmd={build.toolchain}-size
 compiler.define=-DARDUINO=
 compiler.readelf.cmd={build.toolchain}-readelf
@@ -97,6 +98,7 @@ build.psram_freq=
 build.eeprom_start=
 build.flags.optimize=-Os
 build.flags.rtti=-fno-rtti
+build.flags.profile=
 build.fs_start=
 build.fs_end=
 build.usbstack_flags=
@@ -108,11 +110,12 @@ build.libpicow=libipv4.a
 build.boot2=boot2_generic_03h_4_padded_checksum
 build.libpicowdefs=-DLWIP_IPV6=0 -DLWIP_IPV4=1
 build.wificc=-DWIFICC=CYW43_COUNTRY_WORLDWIDE
+build.espwifitype=
 build.debugscript=picoprobe_cmsis_dap.tcl
 build.picodebugflags=
 build.variantdefines=
 
-# Allow Pico boards do be auto-discovered by the IDE
+# Allow Pico boards to be auto-discovered by the IDE
 #discovery.rp2040.pattern={runtime.tools.pqt-python3.path}/python3 -I "{runtime.platform.path}/tools/pluggable_discovery.py"
 discovery.rp2040.pattern={runtime.platform.path}/system/python3/python3 -I "{runtime.platform.path}/tools/pluggable_discovery.py"
 #pluggable_discovery.rp2040.pattern="{runtime.tools.pqt-python3.path}/python3" -I "{runtime.platform.path}/tools/pluggable_discovery.py"
@@ -126,10 +129,10 @@ pluggable_discovery.rp2040.pattern="{runtime.platform.path}/system/python3/pytho
 recipe.hooks.sketch.prebuild.pattern="{runtime.tools.pqt-python3.path}/python3" -I "{runtime.platform.path}/tools/signing.py" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 
 ## Compile c files
-recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DBOARD_NAME="{build.board}" -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {build.debug_port} {build.debug_level} {build.flags.optimize} {includes} "{source_file}" -o "{object_file}"
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} {build.espwifitype} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DBOARD_NAME="{build.board}" -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {build.debug_port} {build.debug_level} {build.flags.optimize} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" -I "{build.path}/core" {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DBOARD_NAME="{build.board}" -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {build.debug_port} {build.debug_level} {build.flags.optimize} {build.wificc} {includes} "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" -I "{build.path}/core" {compiler.cpp.flags} -DF_CPU={build.f_cpu} {build.espwifitype} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DBOARD_NAME="{build.board}" -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {build.debug_port} {build.debug_level} {build.flags.optimize} {build.wificc} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile S files
 recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DBOARD_NAME="{build.board}" -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {build.debug_port} {build.debug_level} {includes} "{source_file}" -o "{object_file}"
