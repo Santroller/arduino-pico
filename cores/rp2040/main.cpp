@@ -69,12 +69,14 @@ extern void __loop() {
     if (arduino::serialEventRun) {
         arduino::serialEventRun();
     }
+#ifdef DEBUG_RP2040_PORT
     if (arduino::serialEvent1Run) {
         arduino::serialEvent1Run();
     }
     if (arduino::serialEvent2Run) {
         arduino::serialEvent2Run();
     }
+#endif
 }
 static struct _reent *_impure_ptr1 = nullptr;
 

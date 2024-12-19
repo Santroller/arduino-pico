@@ -125,9 +125,13 @@ extern const String emptyString;
 #include "SerialUSB.h"
 #endif
 
+#ifdef DEBUG_RP2040_PORT
 #include "SerialUART.h"
+#endif
 #include "RP2040Support.h"
+#ifdef DEBUG_RP2040_PORT
 #include "SerialPIO.h"
+#endif
 #include "Bootsel.h"
 
 // Template which will evaluate at *compile time* to a single 32b number
