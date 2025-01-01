@@ -123,12 +123,10 @@ bool I2S::setFrequency(int newFreq) {
 
 bool I2S::setSysClk(int samplerate) { // optimise sys_clk for desired samplerate
     if (samplerate % 11025 == 0) {
-        set_sys_clock_khz(I2SSYSCLK_44_1, false); // 147.6 unsuccessful - no I2S no USB
-        return true;
+        return set_sys_clock_khz(I2SSYSCLK_44_1, false);
     }
     if (samplerate % 8000 == 0) {
-        set_sys_clock_khz(I2SSYSCLK_8, false);
-        return true;
+        return set_sys_clock_khz(I2SSYSCLK_8, false);
     }
     return false;
 }
@@ -502,20 +500,7 @@ size_t I2S::write(const uint8_t *buffer, size_t size) {
     if (size & 0x3 || !_running || !_isOutput) {
         return 0;
     }
-
-    size_t writtenSize = 0;
-    uint32_t *p = (uint32_t *)buffer;
-    while (size) {
-        if (!_arb->write(*p, false)) {
-            // Blocked, stop write here
-            return writtenSize;
-        } else {
-            p++;
-            size -= 4;
-            writtenSize += 4;
-        }
-    }
-    return writtenSize;
+    return _arb->write((const uint32_t *)buffer, size / sizeof(uint32_t), false);
 }
 
 int I2S::availableForWrite() {

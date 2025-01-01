@@ -20,6 +20,7 @@
 */
 #include <Arduino.h>
 #include "PWMAudio.h"
+#include "PWMAudioPrecalc.h"
 #include <hardware/pwm.h>
 
 
@@ -100,7 +101,8 @@ bool PWMAudio::setFrequency(int frequency) {
         return true; // We're already at the right speed
     }
     if (_pacer < 0) {
-        return false;
+        _sampleRate = frequency;
+        return true;
     }
     uint16_t _pacer_D, _pacer_N;
     // Flip fraction(N for D, D for N) because we are using it as sys_clk * fraction(mechanic of dma_timer_set_fraction) for smaller than sys_clk values
@@ -151,6 +153,7 @@ bool PWMAudio::begin() {
     if (_pacer < 0) {
         return false;
     }
+
     uint16_t _pacer_D = 0;
     uint16_t _pacer_N = 0;
     // Flip fraction(N for D, D for N) because we are using it as sys_clk * fraction(mechanic of dma_timer_set_fraction) for smaller than sys_clk values
@@ -281,6 +284,19 @@ void PWMAudio::find_pacer_fraction(int target, uint16_t *numerator, uint16_t *de
         return;
     }
 
+    // See if it's one of the precalculated values
+    for (size_t i = 0; i < sizeof(__PWMAudio_pacer) / sizeof(__PWMAudio_pacer[0]); i++) {
+        if (target == (int)__PWMAudio_pacer[i].freq) {
+            last_target = target;
+            bestNum = __PWMAudio_pacer[i].n;
+            bestDenom = __PWMAudio_pacer[i].d;
+            *numerator = bestNum;
+            *denominator = bestDenom;
+            return;
+        }
+    }
+
+    // Nope, do exhaustive search.  This is gonna be slooooow
     float targetRatio = (float)F_CPU / target;
     float lowestError = HUGE_VALF;
 
