@@ -178,11 +178,6 @@ SECTIONS
         *(.ram_vector_table)
     } > RAM
 
-    .uninitialized_data (NOLOAD): {
-        . = ALIGN(4);
-        *(.uninitialized_data*)
-    } > RAM
-
     .data : {
         __data_start__ = .;
         *(vtable)
@@ -242,6 +237,11 @@ SECTIONS
         *(.sbss*)
         . = ALIGN(4);
         __bss_end__ = .;
+    } > RAM
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
     } > RAM
 
     .heap (NOLOAD):
