@@ -206,6 +206,7 @@ if (${cpu} MATCHES "rp2350")
     # RP2350-only peripherals
     target_link_libraries(pico-${cpu}
         hardware_xip_cache
+        hardware_powman
         pico_sha256)
 endif()
 
