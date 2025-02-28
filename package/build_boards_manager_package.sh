@@ -70,6 +70,7 @@ cat << EOF > exclude.txt
 .gitignore
 .gitmodules
 .travis.yml
+pico-sdk/lib/tinyusb/docs
 package
 doc
 EOF
