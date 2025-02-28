@@ -25,6 +25,7 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Adafruit KB2040
 * Adafruit Macropad RP2040
 * Adafruit Metro RP2040
+* Adafruit Metro RP2350
 * Adafruit QTPy RP2040
 * Adafruit STEMMA Friend RP2040
 * Adafruit Trinkey RP2040 QT
@@ -68,6 +69,8 @@ Read the [Contributing Guide](https://github.com/earlephilhower/arduino-pico/blo
 * Melopero Cookie RP2040
 * Melopero Shake RP2040
 * METE HOCA Akana R1
+* Makerbase MKSTHR36
+* Makerbase MKSTHR42
 * MyMakers RP2040
 * Neko Systems BL2040 Mini
 * Newsan Archi
@@ -148,7 +151,7 @@ The RP2040 PIO state machines (SMs) are used to generate jitter-free:
 * I2S Input
 * I2S Output
 * Software UARTs (Serial ports)
-
+* Software SPIs
 
 # Installing via Arduino Boards Manager
 ## Windows-specific Notes
