@@ -137,6 +137,7 @@ target_compile_definitions(common-${cpu} INTERFACE
 
 target_compile_options(common-${cpu} INTERFACE
     -fno-exceptions
+    -fpermissive
     -Os
     $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
 )
